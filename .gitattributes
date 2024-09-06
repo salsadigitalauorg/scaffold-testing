@@ -1,0 +1,13 @@
+/.docker/ export-ignore
+/.idea/ export-ignore
+/.ahoy.yml export-ignore
+/.dockerignore export-ignore
+/.env export-ignore
+/.env.local.default export-ignore
+/.gitattributes export-ignore
+/.gitignore export-ignore
+/.lagoon.yml export-ignore
+/behat.xml export-ignore
+/composer.lock export-ignore
+/docker-compose.override.default.yml export-ignore
+/docker-compose.yml export-ignore

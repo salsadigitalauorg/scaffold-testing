@@ -1,0 +1,38 @@
+{
+  "name": "salsadigitalauorg/scaffold-testing",
+  "description": "Provides a set of default Behat tests for Drupal projects, ensuring consistent testing across deployments.",
+  "version": "0.1",
+  "type": "library",
+  "require": {
+    "behat/behat": "^3.6",
+    "drupal/drupal-extension": "^5.0"
+  },
+  "autoload": {
+    "psr-4": {
+      "Salsadigitalauorg\\ScaffoldTesting\\": "src/"
+    }
+  },
+  "scripts": {
+    "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+  },
+  "extra": {
+    "scaffold-testing": {
+      "target-dir": "features/",
+      "files": [
+        "homepage.feature",
+        "login.feature",
+        "search.feature"
+      ],
+      "override": "false"
+    }
+  },
+  "license": "MIT",
+  "authors": [
+    {
+      "name": "Your Name",
+      "email": "your.email@example.com"
+    }
+  ],
+  "minimum-stability": "dev",
+  "prefer-stable": true
+}
