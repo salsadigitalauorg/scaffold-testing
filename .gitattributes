@@ -1,5 +1,6 @@
 /.docker/ export-ignore
 /.idea/ export-ignore
+/.github/ export-ignore
 /.ahoy.yml export-ignore
 /.dockerignore export-ignore
 /.env export-ignore
