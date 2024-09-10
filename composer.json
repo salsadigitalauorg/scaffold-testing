@@ -3,10 +3,13 @@
   "description": "Provides a set of default Behat tests for Drupal projects, ensuring consistent testing across deployments.",
   "version": "0.2",
   "type": "library",
-  "require": {
+  "require-dev": {
     "php": ">=8.2",
     "behat/behat": "^3.6",
-    "drupal/drupal-extension": "^5.0"
+    "drupal/drupal-extension": "^5.0",
+    "drevops/behat-format-progress-fail": "^1",
+    "drevops/behat-screenshot": "1.5.0",
+    "drevops/behat-steps": "^2"
   },
   "autoload": {
     "psr-4": {
@@ -18,13 +21,14 @@
   },
   "extra": {
     "scaffold-testing": {
-      "target-dir": "features/",
+      "target-dir": "tests/behat/",
       "files": [
         "homepage.feature",
         "login.feature",
         "search.feature"
       ],
-      "override": "false"
+      "override_feature": "true",
+      "override_feature_context": "true"
     }
   },
   "license": "MIT",

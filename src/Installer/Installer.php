@@ -1,6 +1,6 @@
 <?php
 
-namespace Salsadigitalauorg\ScaffoldTesting\Installer;;
+namespace Salsadigitalauorg\ScaffoldTesting\Installer;
 
 use Composer\Script\Event;
 use Composer\Installer\PackageEvent;
@@ -8,7 +8,7 @@ use Composer\Installer\PackageEvent;
 class Installer
 {
   /**
-   * Handles the copying of feature files to the specified directory in the consuming project.
+   * Handles the copying of feature files and FeatureContext.php to the specified directories in the consuming project.
    * @param Event $event Composer script event
    */
   public static function features(Event $event)
@@ -25,36 +25,59 @@ class Installer
     }
 
     $config = $extras['scaffold-testing'];
-    $targetDir = rtrim($config['target-dir'], '/') . '/';
+    $targetDir = rtrim($config['target-dir'] ?? 'tests/behat/', '/') . '/';
     $files = $config['files'] ?? [];
-    $override = $config['override'] ?? false;
+    $override_feature = $config['override_feature'] ?? false;
+    $override_feature_context = $config['override_feature_context'] ?? false;
 
-    // Ensuring the target directory exists
+    // Ensuring the target directories exist
     $targetPath = getcwd() . '/' . $targetDir;
-    if (!is_dir($targetPath)) {
-      if (!mkdir($targetPath, 0777, true)) {
-        $io->writeError("Failed to create target directory: $targetPath");
-        return;
-      }
-    }
+    $featurePath = $targetPath . 'features/';
+    $bootstrapPath = $targetPath . 'bootstrap/';
+    
+    self::createDirectory($io, $targetPath);
+    self::createDirectory($io, $featurePath);
+    self::createDirectory($io, $bootstrapPath);
 
-    // Process each file
+    // Process each feature file
     foreach ($files as $file) {
       $sourcePath = __DIR__ . '/../../features/' . $file;
-      $destPath = $targetPath . $file;
+      $destPath = $featurePath . $file;
 
-      // Check if file exists and override is false
-      if (file_exists($destPath) && !$override) {
-        $io->write("Skipping $file because it already exists and 'override' is set to false.");
-        continue;
-      }
+      self::copyFile($io, $sourcePath, $destPath, $override_feature, "feature");
+    }
 
-      // Attempt to copy the file
-      if (!copy($sourcePath, $destPath)) {
-        $io->writeError("Failed to install $file to $targetDir");
-      } else {
-        $io->write("Installed $file to $targetDir");
-      }
+    // Process FeatureContext.php
+    $contextSourcePath = __DIR__ . '/../../bootstrap/FeatureContext.php';
+    $contextDestPath = $bootstrapPath . 'FeatureContext.php';
+    
+    self::copyFile($io, $contextSourcePath, $contextDestPath, $override_feature_context, "FeatureContext.php");
+  }
+
+  /**
+   * Creates a directory if it doesn't exist.
+   */
+  private static function createDirectory($io, $path)
+  {
+    if (!is_dir($path) && !mkdir($path, 0777, true)) {
+      $io->writeError("Failed to create directory: $path");
+    }
+  }
+
+  /**
+   * Copies a file if conditions are met.
+   */
+  private static function copyFile($io, $sourcePath, $destPath, $override, $fileType)
+  {
+    if (file_exists($destPath) && !$override) {
+      $io->write("Skipping $fileType file because it already exists and 'override_$fileType' is set to false.");
+      return;
+    }
+
+    if (!copy($sourcePath, $destPath)) {
+      $io->writeError("Failed to install $fileType file to " . dirname($destPath));
+    } else {
+      $io->write("Installed $fileType file to " . dirname($destPath));
     }
   }
 }
