@@ -53,15 +53,25 @@ To customize the tests or the installation path, you can modify the `extra` sect
 ```json
 "extra": {
   "scaffold-testing": {
-    "target-dir": "custom/path/for/features/",
+    "target-dir": "tests/behat/",
     "files": [
-      "customized_home.feature",
-      "customized_permissions.feature"
+      "home.feature",
+      "permissions.feature",
+      "workflow.feature",
+      "search.feature"
     ],
-    "override": "true"
+    "override_feature": false,
+    "override_feature_context": false
   }
 }
 ```
+
+- `target-dir`: Specifies the base directory for test files (default: "tests/behat/").
+- `files`: List of feature files to be copied from the package to your project.
+- `override_feature`: Whether to overwrite existing feature files (default: false).
+- `override_feature_context`: Whether to overwrite the existing FeatureContext.php file (default: false).
+
+The installer will create the necessary subdirectories within the `target-dir`:
 
 #### Contributing
 
