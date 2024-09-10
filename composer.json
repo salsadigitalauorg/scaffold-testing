@@ -8,16 +8,30 @@
     "behat/behat": "^3.6",
     "drupal/drupal-extension": "^5.0",
     "drevops/behat-format-progress-fail": "^1",
-    "drevops/behat-screenshot": "1.5.0",
-    "drevops/behat-steps": "^2"
+    "drevops/behat-screenshot": "^1.5.0",
+    "drevops/behat-steps": "^2",
+    "phpunit/phpunit": "^9.5",
+    "composer/composer": "^2.0"
   },
   "autoload": {
     "psr-4": {
       "Salsadigitalauorg\\ScaffoldTesting\\": "src/"
     }
   },
+  "autoload-dev": {
+    "psr-4": {
+      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": "tests/"
+    }
+  },
   "scripts": {
-    "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+    "phpunit-test": "phpunit --configuration phpunit.xml",
+    "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features",
+    "post-install-cmd": [
+        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+    ],
+    "post-update-cmd": [
+        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+    ]
   },
   "extra": {
     "scaffold-testing": {

@@ -14,7 +14,20 @@ class Installer
   public static function features(Event $event)
   {
     $io = $event->getIO();
+    $io->write('Installer::features method called');
+
     $composer = $event->getComposer();
+    $extras = $composer->getPackage()->getExtra();
+
+    $io->write('Extras: ' . json_encode($extras));
+
+    if (!isset($extras['scaffold-testing'])) {
+      $io->write('No scaffold-testing configuration found');
+      return;
+    }
+
+    $config = $extras['scaffold-testing'];
+    $io->write('Config: ' . json_encode($config));
 
     // Access extra configurations in composer.json
     $extras = $composer->getPackage()->getExtra();
