@@ -19,15 +19,10 @@ class Installer
     $composer = $event->getComposer();
     $extras = $composer->getPackage()->getExtra();
 
-    $io->write('Extras: ' . json_encode($extras));
-
     if (!isset($extras['scaffold-testing'])) {
       $io->write('No scaffold-testing configuration found');
       return;
     }
-
-    $config = $extras['scaffold-testing'];
-    $io->write('Config: ' . json_encode($config));
 
     // Access extra configurations in composer.json
     $extras = $composer->getPackage()->getExtra();
@@ -47,23 +42,23 @@ class Installer
     $targetPath = getcwd() . '/' . $targetDir;
     $featurePath = $targetPath . 'features/';
     $bootstrapPath = $targetPath . 'bootstrap/';
-    
+
     self::createDirectory($io, $targetPath);
     self::createDirectory($io, $featurePath);
     self::createDirectory($io, $bootstrapPath);
 
     // Process each feature file
     foreach ($files as $file) {
-      $sourcePath = __DIR__ . '/../../features/' . $file;
+      $sourcePath = __DIR__ . '/../../tests/behat/features/' . $file;
       $destPath = $featurePath . $file;
 
-      self::copyFile($io, $sourcePath, $destPath, $override_feature, "feature");
+      self::copyFile($io, $sourcePath, $destPath, $override_feature, $file);
     }
 
     // Process FeatureContext.php
-    $contextSourcePath = __DIR__ . '/../../bootstrap/FeatureContext.php';
+    $contextSourcePath = __DIR__ . '/../../tests/behat/bootstrap/FeatureContext.php';
     $contextDestPath = $bootstrapPath . 'FeatureContext.php';
-    
+
     self::copyFile($io, $contextSourcePath, $contextDestPath, $override_feature_context, "FeatureContext.php");
   }
 

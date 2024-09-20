@@ -26,23 +26,19 @@
   "scripts": {
     "phpunit-test": "phpunit --configuration phpunit.xml",
     "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features",
-    "post-install-cmd": [
-        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
-    ],
-    "post-update-cmd": [
-        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
-    ]
+    "post-install-cmd": [ ],
+    "post-update-cmd": [ ]
   },
   "extra": {
     "scaffold-testing": {
-      "target-dir": "tests/behat/",
+      "target-dir": "tmp/tests/behat/",
       "files": [
         "homepage.feature",
         "login.feature",
         "search.feature"
       ],
-      "override_feature": "true",
-      "override_feature_context": "true"
+      "override_feature": true,
+      "override_feature_context": true
     }
   },
   "license": "MIT",
