@@ -1,7 +1,7 @@
 {
   "name": "salsadigitalauorg/scaffold-testing",
   "description": "Provides a set of default Behat tests for Drupal projects, ensuring consistent testing across deployments.",
-  "version": "0.3",
+  "version": "0.4.0",
   "type": "library",
   "require-dev": {
     "php": ">=8.2",
