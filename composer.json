@@ -37,7 +37,6 @@
         "login.feature",
         "search.feature"
       ],
-      "override_feature": true,
       "override_feature_context": true
     }
   },

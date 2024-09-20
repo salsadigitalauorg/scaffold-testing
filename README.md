@@ -48,28 +48,50 @@ Make sure you have configured Behat properly in your Drupal project to recognize
 
 #### Configuration
 
+To ensure the `salsadigitalauorg/scaffold-testing` runs as you execute `composer install` or `composer update`, 
+add the following to the `post-install-cmd` and `post-update-cmd` sections of your project' composer.json:
+
+```json
+"scripts": {
+   "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features",
+   "post-install-cmd": [
+        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+    ],
+   "post-update-cmd": [
+        "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features"
+    ]
+}
+```
+
+Alternatively, add `install-features` command only:
+
+```json
+"scripts": {
+   "install-features": "Salsadigitalauorg\\ScaffoldTesting\\Installer\\Installer::features",
+}
+```
+
 To customize the tests or the installation path, you can modify the `extra` section in your project's `composer.json`:
 
 ```json
 "extra": {
   "scaffold-testing": {
     "target-dir": "tests/behat/",
-    "files": [
-      "home.feature",
-      "permissions.feature",
-      "workflow.feature",
-      "search.feature"
-    ],
-    "override_feature": false,
+    "files": {
+        "homepage.feature": false,
+        "login.feature": false,
+        "search.feature": true
+    },
     "override_feature_context": false
   }
 }
 ```
 
 - `target-dir`: Specifies the base directory for test files (default: "tests/behat/").
-- `files`: List of feature files to be copied from the package to your project.
-- `override_feature`: Whether to overwrite existing feature files (default: false).
-- `override_feature_context`: Whether to overwrite the existing Salsadigitalauorg\ScaffoldTesting\Tests\behat\bootstrap\FeatureContext.php file (default: false).
+- `files`: An object where keys are feature file names and values are boolean flags indicating whether to override existing files. When `files` key is omited, the existing files will be left untouched and missing files will be installed.
+- `override_feature_context`: Whether to overwrite the existing FeatureContext.php file (default: false).
+
+If the `files` section is omitted, all available feature files will be installed only if they don't already exist in the target directory.
 
 The installer will create the necessary subdirectories within the `target-dir`:
 

@@ -12,3 +12,4 @@
 /composer.lock export-ignore
 /docker-compose.override.default.yml export-ignore
 /docker-compose.yml export-ignore
+/tmp export-ignore
