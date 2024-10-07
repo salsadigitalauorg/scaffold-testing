@@ -36,7 +36,8 @@
         "homepage.feature",
         "login.feature",
         "search.feature",
-        "permissions.feature"
+        "permissions.feature",
+        "contenttypes.feature"
       ],
       "override_feature_context": true
     }
