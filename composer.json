@@ -35,7 +35,8 @@
       "files": [
         "homepage.feature",
         "login.feature",
-        "search.feature"
+        "search.feature",
+        "permissions.feature"
       ],
       "override_feature_context": true
     }
