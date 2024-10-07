@@ -97,5 +97,30 @@ class FeatureContext extends DrupalContext
     }
   }
 
+  /**
+   * Selects the multiple dropdown(single select/multiple select) values
+   *
+   * @param $table
+   *    array The list of values to verify
+   * @When /^I select the following <fields> with <values>$/
+   */
+  public function iSelectTheFollowingFieldsWithValues(TableNode $table) {
+    $multiple = TRUE;
+    $table = $table->getHash();
+    foreach ($table as $key => $value) {
+      $select = $this->getSession()
+        ->getPage()
+        ->findField($table[$key]['fields']);
+      if (empty($select)) {
+        throw new \Exception("The page does not have the " . $table[$key]['fields'] . " field");
+      }
+      // The default true value for 'multiple' throws an error 'value cannot be an array' for single select fields
+      $multiple = $select->getAttribute('multiple') ? TRUE : FALSE;
+      $this->getSession()
+        ->getPage()
+        ->selectFieldOption($table[$key]['fields'], $table[$key]['values'], $multiple);
+    }
+  }
+
 }
 
