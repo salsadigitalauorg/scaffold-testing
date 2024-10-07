@@ -2,35 +2,17 @@
 
 The **Scaffold Testing Library** provides a set of default Behat tests tailored for Drupal projects, aiming to ensure consistent testing across different deployments. This library helps streamline the testing process by providing ready-to-use Behat test scenarios that cover common functionalities within Drupal sites.
 
-#### Features
+#### Jumpstart Features
 
 - **Home Page Test**: Ensures the homepage loads successfully and contains specific keywords or phrases.
 - **Permissions Test**: Checks different user roles for appropriate access rights to content in various states (published, draft, in review).
 - **Workflow Test**: Tests the expected moderation states and transitions between them.
 - **Search Functionality Test**: Verifies that search indexing works and returns expected results.
+- **Content Types Test**: Verifies that content types can be created.
 
 #### Installation
 
-1. **Add the Library to Your Project**: You can include this library in your Drupal project by adding it to your `composer.json` file. Ensure you have access to the library path if it's hosted locally or available on a VCS. For local development, you can use:
-
-    ```json
-    {
-      "repositories": [
-        {
-          "type": "path",
-          "url": "/path/to/scaffold-testing",
-          "options": {
-            "symlink": false
-          }
-        }
-      ],
-      "require-dev": {
-        "salsadigitalauorg/scaffold-testing": "*"
-      }
-    }
-    ```
-
-2. **Install the Library**: Run the following command to install the library:
+1. **Install the Library**: Run the following command to install the library:
 
     ```bash
     composer require --dev salsadigitalauorg/scaffold-testing
@@ -80,9 +62,11 @@ To customize the tests or the installation path, you can modify the `extra` sect
     "files": {
         "homepage.feature": false,
         "login.feature": false,
-        "search.feature": true
+        "search.feature": true,
+        "contenttypes.feature": false
     },
-    "override_feature_context": false
+    "override_feature_context": false,
+    "override_feature": false,
   }
 }
 ```
@@ -90,6 +74,7 @@ To customize the tests or the installation path, you can modify the `extra` sect
 - `target-dir`: Specifies the base directory for test files (default: "tests/behat/").
 - `files`: An object where keys are feature file names and values are boolean flags indicating whether to override existing files. When `files` key is omited, the existing files will be left untouched and missing files will be installed.
 - `override_feature_context`: Whether to overwrite the existing FeatureContext.php file (default: false).
+- `override_feature`: Whether to overwrite the existing feature file (default: false).
 
 If the `files` section is omitted, all available feature files will be installed only if they don't already exist in the target directory.
 
