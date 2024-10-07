@@ -37,7 +37,8 @@ class Installer
             $files = array_map('basename', glob($sourceDir . '*.feature'));
             $files = array_fill_keys($files, false);  // Set override to false for all files
         } else {
-            $files = $config['files'];
+            // Convert the list of files to an associative array with override set to false
+            $files = array_fill_keys($config['files'], false);
         }
 
         foreach ($files as $file => $override) {
