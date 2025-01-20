@@ -1,0 +1,68 @@
+name: Test Scaffold Testing Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: drupal
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+
+    steps:
+      - uses: actions/checkout@v4
+      
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, pdo_mysql, bcmath, soap, intl, gd, exif, iconv
+          coverage: none
+          tools: composer:v2
+
+      - name: Get Composer Cache Directory
+        id: composer-cache
+        run: |
+          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+
+      - uses: actions/cache@v3
+        with:
+          path: ${{ steps.composer-cache.outputs.dir }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          restore-keys: |
+            ${{ runner.os }}-composer-
+
+      - name: Create Drupal project
+        run: |
+          composer create-project drupal/recommended-project:^10 drupal
+          cd drupal
+          composer config repositories.scaffold-testing path "../"
+          composer require salsadigitalauorg/scaffold-testing:@dev --no-interaction
+
+      - name: Install Drupal
+        run: |
+          cd drupal
+          php -d memory_limit=-1 ./vendor/bin/drush site:install --db-url=mysql://root:root@127.0.0.1/drupal -y
+          php -d memory_limit=-1 ./vendor/bin/drush en -y system
+
+      - name: Run PHPUnit tests
+        run: |
+          cd drupal
+          ./vendor/bin/phpunit -c vendor/salsadigitalauorg/scaffold-testing/phpunit.xml
+
+      - name: Run Behat tests
+        run: |
+          cd drupal
+          cp vendor/salsadigitalauorg/scaffold-testing/tests/behat/behat.yml .
+          ./vendor/bin/behat --config=behat.yml 
