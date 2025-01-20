@@ -28,7 +28,7 @@ class Installer extends LibraryInstaller
     public static function features(Event $event): void
     {
         $io = $event->getIO();
-        $io->write('Installer::features method called');
+        $io->write('[scaffold-testing] Installer::features method called');
 
         $composer = $event->getComposer();
         $extras = $composer->getPackage()->getExtra();
@@ -78,7 +78,7 @@ class Installer extends LibraryInstaller
                         $io->writeError("Failed to update $file file in " . dirname($destPath));
                     }
                 } else {
-                    $io->write("Skipped $file file as it already exists and override is set to false.");
+                    $io->write("[scaffold-testing] Skipped $file file as it already exists and override is set to false.");
                 }
             } else {
                 $io->writeError("Source file not found: $file");
@@ -91,15 +91,15 @@ class Installer extends LibraryInstaller
         if (file_exists($contextSourcePath)) {
             if (!file_exists($contextDestPath) || $override_feature_context) {
                 if (copy($contextSourcePath, $contextDestPath)) {
-                    $io->write("Installed FeatureContext.php file to $bootstrapPath");
+                    $io->write("[scaffold-testing] Installed FeatureContext.php file to $bootstrapPath");
                 } else {
-                    $io->writeError("Failed to install FeatureContext.php file to $bootstrapPath");
+                    $io->writeError("[scaffold-testing] Failed to install FeatureContext.php file to $bootstrapPath");
                 }
             } else {
-                $io->write("Skipped FeatureContext.php file as it already exists and override is set to false.");
+                $io->write("[scaffold-testing] Skipped FeatureContext.php file as it already exists and override is set to false.");
             }
         } else {
-            $io->writeError("Source file not found: FeatureContext.php");
+            $io->writeError("[scaffold-testing] Source file not found: FeatureContext.php");
         }
 
         if (self::shouldUpdateFeatureContext($config)) {

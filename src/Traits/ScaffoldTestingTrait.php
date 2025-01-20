@@ -64,22 +64,6 @@ trait ScaffoldTestingTrait
     }
 
     /**
-     * @When I go to the forum index page
-     */
-    public function iGoToTheForumIndexPage(): void
-    {
-        $this->getSession()->visit($this->locatePath('/portal/community-forum'));
-    }
-
-    /**
-     * @When I go to a specific forum page
-     */
-    public function iGoToASpecificForumPage(): void
-    {
-        $this->getSession()->visit($this->locatePath('/node/358'));
-    }
-
-    /**
      * @Then I should be able to access the page
      */
     public function iShouldBeAbleToAccessThePage(): void
