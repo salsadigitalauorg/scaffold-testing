@@ -87,3 +87,72 @@ Contributions to the **Scaffold Testing Library** are welcome! Please feel free 
 #### License
 
 This library is provided under the MIT License. See the LICENSE file for more information.
+
+# Breaking Changes in Version 0.4.2
+
+## Important: Trait-based Step Definitions
+
+Starting from version 0.4.2, we've moved to a trait-based approach for step definitions. This is a breaking change that requires manual intervention for existing projects.
+
+### For Existing Projects
+
+If you're upgrading from a previous version, you'll need to:
+
+1. Remove the old step definitions from your `FeatureContext.php`
+2. Add the trait to your `FeatureContext.php`:
+
+```php
+use Salsadigitalauorg\ScaffoldTesting\Traits\ScaffoldTestingTrait;
+
+class FeatureContext implements Context
+{
+    use ScaffoldTestingTrait;
+    
+    // Your custom step definitions...
+}
+```
+
+### For New Projects
+
+The installer will automatically set up your `FeatureContext.php` with the trait. You can add your custom step definitions alongside the trait.
+
+### Combining Custom Steps
+
+You can add your own custom step definitions alongside the trait:
+
+```php
+class FeatureContext implements Context
+{
+    use ScaffoldTestingTrait;
+    
+    /**
+     * @Given I have my custom step
+     */
+    public function iHaveMyCustomStep(): void
+    {
+        // Your custom step implementation
+    }
+}
+```
+
+## Requirements
+
+- PHP 8.3 or higher
+- Composer 2.x
+- Behat 3.13 or higher
+- PHPUnit 9.6.13 or higher (compatible with Drupal core)
+
+## Dependencies
+
+This package requires the following dependencies which will be installed automatically:
+
+```json
+{
+    "require": {
+        "behat/behat": "^3.13",
+        "composer/composer": "^2.6",
+        "symfony/process": "^6.0|^7.0",
+        "phpunit/phpunit": "^9.6.13"
+    }
+}
+```
