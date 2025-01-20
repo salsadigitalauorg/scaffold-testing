@@ -2,9 +2,7 @@ name: Test Scaffold Testing Package
 
 on:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   test:
