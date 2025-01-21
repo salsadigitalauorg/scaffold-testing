@@ -9,19 +9,27 @@ jobs:
   drupal-tests:
     runs-on: ubuntu-latest
     container:
-      image: ghcr.io/salsadigitalauorg/drupal-testing:php8.3
-      credentials:
-        username: ${{ github.actor }}
-        password: ${{ secrets.GITHUB_TOKEN }}
+      image: php:8.3-cli
 
     steps:
     - name: Checkout code
       uses: actions/checkout@v4
 
+    - name: Install dependencies
+      run: |
+        apt-get update && apt-get install -y \
+          git \
+          unzip \
+          libzip-dev \
+          && docker-php-ext-install zip
+
+    - name: Install Composer
+      run: |
+        curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
     - name: Run PHPUnit tests
       run: |
-        docker build -t scaffold-testing -f .github/drupal/Dockerfile .
-        docker run --rm -v $(pwd):/app scaffold-testing \
-          bash -c "composer install --no-interaction && ./vendor/bin/phpunit \
-          --configuration=.github/drupal/phpunit.xml \
-          .github/drupal/tests/Unit/Installer/InstallerTest.php"
+        composer install --no-interaction
+        ./vendor/bin/phpunit \
+          --configuration=phpunit.xml \
+          tests/Unit/Installer/InstallerTest.php

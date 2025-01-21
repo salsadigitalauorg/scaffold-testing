@@ -9,70 +9,31 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
+    container:
+      image: php:8.3-cli
 
     steps:
       - uses: actions/checkout@v2
 
-      - name: Setup PHP
-        uses: shivammathur/setup-php@v2
-        with:
-          php-version: '8.3'
-          extensions: dom, curl, libxml, mbstring, zip, bcmath, intl
-          coverage: none
-
-      - name: Create project structure
+      - name: Install system dependencies
         run: |
-          # Create directory and set permissions
-          sudo mkdir -p /var/www/html
-          sudo chown -R $USER:$USER /var/www/html
-          cd /var/www/html
-          
-          # Copy source files directly
-          cp -r $GITHUB_WORKSPACE/src .
-          cp -r $GITHUB_WORKSPACE/tests .
-          cp $GITHUB_WORKSPACE/phpunit.xml .
-          cp $GITHUB_WORKSPACE/.github/drupal/composer.json .
-          
-          # Create symlink for local development
-          mkdir -p vendor/salsadigitalauorg
-          ln -sf $GITHUB_WORKSPACE /var/www/html/vendor/salsadigitalauorg/scaffold-testing
+          apt-get update && apt-get install -y \
+            git \
+            unzip \
+            libzip-dev \
+            && docker-php-ext-install zip
 
-          # Debug information
-          echo "Project structure:"
-          ls -la
-          echo "Vendor symlink:"
-          ls -la vendor/salsadigitalauorg/scaffold-testing
-
-      - name: Get Composer Cache Directory
-        id: composer-cache
-        working-directory: /var/www/html
+      - name: Install Composer
         run: |
-          echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
-      - uses: actions/cache@v3
-        with:
-          path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('/var/www/html/composer.json') }}
-          restore-keys: |
-            ${{ runner.os }}-composer-
-
-      - name: Install dependencies
-        working-directory: /var/www/html
-        env:
-          COMPOSER_DISABLE_XDEBUG_WARN: 1
-          COMPOSER_PROCESS_TIMEOUT: 2000
-          COMPOSER_DISABLE_UNZIP: 1
+      - name: Run tests
         run: |
-          composer install --prefer-dist --no-interaction --no-progress
-          composer dump-autoload -o
+          # Install dependencies
+          composer install --no-interaction --no-progress
 
-      - name: Run PHPUnit tests
-        working-directory: /var/www/html
-        env:
-          XDEBUG_MODE: off
-        run: |
+          # Run PHPUnit tests
           ./vendor/bin/phpunit \
             -v \
-            --bootstrap vendor/autoload.php \
-            -c phpunit.xml \
+            --configuration phpunit.xml \
             tests/Unit/ 
