@@ -47,6 +47,12 @@
         },
         "sort-packages": true
     },
+    "autoload-dev": {
+        "psr-4": {
+            "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": "vendor/salsadigitalauorg/scaffold-testing/tests/",
+            "Salsadigitalauorg\\ScaffoldTesting\\Tests\\Behat\\": "vendor/salsadigitalauorg/scaffold-testing/tests/behat/bootstrap/"
+        }
+    },
     "extra": {
         "drupal-scaffold": {
             "locations": {

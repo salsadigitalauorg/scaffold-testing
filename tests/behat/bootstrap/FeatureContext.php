@@ -5,8 +5,7 @@
  * Defines application features for Behat testing within a Drupal context.
  */
 
-namespace Salsadigitalauorg\ScaffoldTesting\Tests\behat\bootstrap;
-
+use Behat\Behat\Context\Context;
 use Behat\Gherkin\Node\TableNode;
 use DrevOps\BehatSteps\ContentTrait;
 use DrevOps\BehatSteps\FieldTrait;
@@ -17,9 +16,11 @@ use DrevOps\BehatSteps\TaxonomyTrait;
 use DrevOps\BehatSteps\WaitTrait;
 use DrevOps\BehatSteps\WatchdogTrait;
 use Drupal\DrupalExtension\Context\DrupalContext;
+use Drupal\user\Entity\User;
 use Drupal\group\Entity\Group;
 use Drupal\group\Entity\GroupType;
-use Drupal\user\Entity\User;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Salsadigitalauorg\ScaffoldTesting\Traits\ScaffoldTestingTrait;
 
 // Ensure TableNode is included for handling table data
 
@@ -30,6 +31,7 @@ class FeatureContext extends DrupalContext
 {
 
   use ContentTrait, FieldTrait, FileTrait, PathTrait, TaxonomyTrait, SearchApiTrait, WaitTrait, WatchdogTrait;
+  use ScaffoldTestingTrait;
 
   /**
    * Creates a new user with specified details.
@@ -123,4 +125,3 @@ class FeatureContext extends DrupalContext
   }
 
 }
-

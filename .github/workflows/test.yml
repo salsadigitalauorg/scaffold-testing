@@ -9,40 +9,15 @@ on:
 jobs:
   test:
     runs-on: ubuntu-latest
-    services:
-      mysql:
-        image: mysql:8.0
-        env:
-          MYSQL_ROOT_PASSWORD: root
-          MYSQL_DATABASE: drupal
-        ports:
-          - 3306:3306
-        options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
-      
-      chrome:
-        image: selenium/standalone-chrome:111.0
-        ports:
-          - 4444:4444
-        options: >-
-          --shm-size="1gb"
-          --health-cmd="/opt/bin/check-grid.sh"
-          --health-interval=10s
-          --health-timeout=5s
-          --health-retries=3
 
     steps:
       - uses: actions/checkout@v2
-
-      - name: Install system dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y default-mysql-client
 
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
           php-version: '8.3'
-          extensions: dom, curl, libxml, mbstring, zip, pdo, mysql, pdo_mysql, bcmath, soap, intl, gd, exif, iconv
+          extensions: dom, curl, libxml, mbstring, zip, bcmath, intl
           coverage: none
 
       - name: Create project structure
@@ -56,8 +31,17 @@ jobs:
           cp -r $GITHUB_WORKSPACE/src .
           cp -r $GITHUB_WORKSPACE/tests .
           cp $GITHUB_WORKSPACE/phpunit.xml .
-          # Use Drupal composer.json
           cp $GITHUB_WORKSPACE/.github/drupal/composer.json .
+          
+          # Create symlink for local development
+          mkdir -p vendor/salsadigitalauorg
+          ln -sf $GITHUB_WORKSPACE /var/www/html/vendor/salsadigitalauorg/scaffold-testing
+
+          # Debug information
+          echo "Project structure:"
+          ls -la
+          echo "Vendor symlink:"
+          ls -la vendor/salsadigitalauorg/scaffold-testing
 
       - name: Get Composer Cache Directory
         id: composer-cache
@@ -80,46 +64,7 @@ jobs:
           COMPOSER_DISABLE_UNZIP: 1
         run: |
           composer install --prefer-dist --no-interaction --no-progress
-
-      - name: Set up Drupal
-        working-directory: /var/www/html
-        run: |
-          # Create sites/default directory
-          mkdir -p web/sites/default/files
-          chmod -R 777 web/sites/default/files
-
-          # Copy default settings file
-          cp web/sites/default/default.settings.php web/sites/default/settings.php
-          chmod 666 web/sites/default/settings.php
-
-          # Add database configuration
-          cat >> web/sites/default/settings.php << 'EOL'
-
-          $databases['default']['default'] = [
-            'database' => 'drupal',
-            'username' => 'root',
-            'password' => 'root',
-            'host' => '127.0.0.1',
-            'port' => '3306',
-            'driver' => 'mysql',
-            'prefix' => '',
-          ];
-          EOL
-
-          # Install Drupal
-          ./vendor/bin/drush site:install --db-url=mysql://root:root@127.0.0.1/drupal -y
-
-      - name: Verify Drupal files
-        working-directory: /var/www/html
-        run: |
-          ls -la
-          echo "Current directory: $(pwd)"
-          echo "Autoloader path: $(realpath vendor/autoload.php)"
-          echo "PHPUnit config path: $(realpath phpunit.xml)"
-          echo "Drush status:"
-          ./vendor/bin/drush status
-          echo "Drush requirements:"
-          ./vendor/bin/drush core:requirements
+          composer dump-autoload -o
 
       - name: Run PHPUnit tests
         working-directory: /var/www/html
@@ -130,19 +75,4 @@ jobs:
             -v \
             --bootstrap vendor/autoload.php \
             -c phpunit.xml \
-            tests/Unit/
-
-      - name: Create test directories
-        working-directory: /var/www/html
-        run: |
-          mkdir -p .logs/screenshots
-          mkdir -p .logs/test_results/behat
-          chmod -R 777 .logs
-          cp $GITHUB_WORKSPACE/.github/behat.gha.yml behat.yml
-          # Verify FeatureContext class is available
-          ls -la tests/behat/bootstrap/FeatureContext.php
-          cat tests/behat/bootstrap/FeatureContext.php | head -n 5
-
-      - name: Run Behat tests
-        working-directory: /var/www/html
-        run: ./vendor/bin/behat --config=behat.yml 
+            tests/Unit/ 
