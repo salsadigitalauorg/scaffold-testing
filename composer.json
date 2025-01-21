@@ -1,7 +1,7 @@
 {
   "name": "salsadigitalauorg/scaffold-testing",
   "description": "Testing framework for Vortex scaffold",
-  "version": "0.4.3",
+  "version": "0.4.4",
   "type": "library",
   "license": "GPL-2.0-or-later",
   "autoload": {

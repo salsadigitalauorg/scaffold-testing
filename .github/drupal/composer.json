@@ -10,18 +10,15 @@
     },
     "repositories": [
         {
-            "type": "composer",
-            "url": "https://packages.drupal.org/8"
-        },
-        {
             "type": "path",
             "url": "/var/www/html",
             "options": {
-                "symlink": true,
-                "versions": {
-                    "salsadigitalauorg/scaffold-testing": "0.4.3"
-                }
+                "symlink": true
             }
+        },
+        {
+            "type": "composer",
+            "url": "https://packages.drupal.org/8"
         }
     ],
     "require": {
@@ -30,7 +27,7 @@
         "drupal/core-project-message": "^10.1",
         "drupal/core-recommended": "^10.1",
         "drush/drush": "^12.4",
-        "salsadigitalauorg/scaffold-testing": "@dev"
+        "salsadigitalauorg/scaffold-testing": "*"
     },
     "require-dev": {
         "drevops/behat-format-progress-fail": "^1",

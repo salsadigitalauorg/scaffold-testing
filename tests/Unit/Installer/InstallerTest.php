@@ -19,9 +19,12 @@ class InstallerTest extends TestCase
     protected Config $config;
     protected Composer $composer;
     protected Event $event;
+    protected string $projectRoot;
 
     protected function setUp(): void
     {
+        $this->projectRoot = '/var/www/html';
+        
         $this->io = $this->createMock(IOInterface::class);
         $this->package = $this->createMock(RootPackage::class);
         $this->config = $this->createMock(Config::class);
@@ -32,7 +35,7 @@ class InstallerTest extends TestCase
             
         $this->config->method('get')
             ->with('vendor-dir')
-            ->willReturn('/var/www/html/vendor');
+            ->willReturn($this->projectRoot . '/vendor');
             
         $this->package->method('getExtra')
             ->willReturn([
@@ -53,38 +56,14 @@ class InstallerTest extends TestCase
             ->willReturn($this->composer);
     }
 
-    public function testGetSubscribedEvents(): void
-    {
-        $this->io->expects(self::atLeastOnce())
-            ->method('write')
-            ->with('[scaffold-testing] Installer::features method called');
-            
-        Installer::features($this->event);
-    }
-
-    public function testGetInstallPaths(): void
-    {
-        $this->io->expects(self::atLeastOnce())
-            ->method('write')
-            ->with('[scaffold-testing] Installer::features method called');
-            
-        Installer::features($this->event);
-    }
-
     public function testFeatures(): void
     {
-        $this->io->expects(self::atLeastOnce())
+        $this->io->expects(self::exactly(2))
             ->method('write')
-            ->with('[scaffold-testing] Installer::features method called');
-            
-        Installer::features($this->event);
-    }
-
-    public function testContentTypes(): void
-    {
-        $this->io->expects(self::atLeastOnce())
-            ->method('write')
-            ->with('[scaffold-testing] Installer::features method called');
+            ->withConsecutive(
+                ['[scaffold-testing] Installer::features method called'],
+                ['[scaffold-testing] Skipped permissions.feature file as it already exists and override is set to false.']
+            );
             
         Installer::features($this->event);
     }
@@ -92,7 +71,7 @@ class InstallerTest extends TestCase
     protected function tearDown(): void
     {
         // Cleanup test files using absolute paths
-        @unlink('/var/www/html/tests/behat/features/login.feature');
-        @unlink('/var/www/html/tests/behat/features/search.feature');
+        @unlink($this->projectRoot . '/tests/behat/features/permissions.feature');
+        @unlink($this->projectRoot . '/tests/behat/bootstrap/FeatureContext.php');
     }
 }

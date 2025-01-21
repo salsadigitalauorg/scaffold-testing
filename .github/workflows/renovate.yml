@@ -1,25 +1,37 @@
 name: Renovate
 on:
   schedule:
-    - cron: '1 9 * * 1'
+    - cron: '1 9 * * 1'  # Run every Monday at 9:01 AM
+  workflow_dispatch:      # Allow manual triggering
+  push:
+    branches:
+      - main
+    paths:
+      - 'composer.json'
+      - 'composer.lock'
+      - 'renovate-gh.json'
+      - '.github/workflows/renovate.yml'
+
 jobs:
   renovate:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
         uses: actions/checkout@v4.1.7
-      - uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
+
+      - name: Validate Renovate config
+        uses: suzuki-shunsuke/github-action-renovate-config-validator@v1.0.1
+
       - name: Self-hosted Renovate
         uses: renovatebot/github-action@v40.2.3
         env:
-          # Update the value of RENOVATE_GIT_AUTHOR with your own.
-          RENOVATE_GIT_AUTHOR: 'Renovate Self Hosted <servicedesk.team+renovatebot@salsa.digital>'
-          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: 'Renovate Dependency Dashboard (self-hosted) by GitHub Actions'
+          RENOVATE_GIT_AUTHOR: 'salsadeploy <deployer@salsa.digital>'
+          RENOVATE_DEPENDENCY_DASHBOARD_TITLE: 'Renovate Dependency Dashboard'
           RENOVATE_DEPENDENCY_DASHBOARD: true
           RENOVATE_REPOSITORIES: ${{ github.repository }}
           RENOVATE_PLATFORM: 'github'
           RENOVATE_AUTODISCOVER: false
-          RENOVATE_DRY_RUN: true
+          LOG_LEVEL: debug
         with:
           configurationFile: renovate-gh.json
           token: ${{ secrets.RENOVATE_TOKEN }}

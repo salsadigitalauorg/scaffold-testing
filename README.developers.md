@@ -38,6 +38,36 @@ composer phpunit-test
 act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
 ```
 
+### GitHub Actions Local Development
+
+#### Prerequisites
+1. Install `act` tool:
+   ```bash
+   brew install act  # macOS
+   ```
+
+2. Ensure Docker is running on your machine.
+
+#### Running GHA Locally
+
+Basic usage:
+```bash
+act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
+```
+
+Reset environment and re-run tests:
+```bash
+# Stop and remove all act containers, then run tests
+docker stop $(docker ps -a | grep act | awk '{print $1}') && \
+docker rm --volumes $(docker ps -a | grep act | awk '{print $1}') && \
+act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
+```
+
+Common issues:
+- If tests fail, always clean up containers before re-running
+- Use `-v` flag for verbose output to debug issues
+- Check Docker logs if containers fail to start
+
 ### Test Environment
 
 Tests are executed in a Docker container with the following setup:
