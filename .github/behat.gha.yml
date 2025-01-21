@@ -1,0 +1,68 @@
+default:
+  autoload: ['%paths.base%/../tests/behat/bootstrap']
+  gherkin:
+    cache: ~
+    filters:
+      tags: '~@skipped'
+  suites:
+    default:
+      paths: ['%paths.base%/../tests/behat/features']
+      contexts:
+        - Salsadigitalauorg\ScaffoldTesting\Tests\Behat\FeatureContext
+        - Drupal\DrupalExtension\Context\MinkContext
+        - Drupal\DrupalExtension\Context\MarkupContext
+        - Drupal\DrupalExtension\Context\MessageContext
+        - DrevOps\BehatScreenshotExtension\Context\ScreenshotContext
+  formatters:
+    progress_fail: true
+    junit:
+      output_path: '%paths.base%/../.logs/test_results/behat'
+
+  extensions:
+    Drupal\MinkExtension:
+      base_url: http://localhost:8080
+      files_path: '%paths.base%/../tests/behat/fixtures'
+      browser_name: chrome
+      sessions:
+        default:
+          browserkit_http: ~
+        javascript:
+          selenium2:
+            wd_host: "http://localhost:4444/wd/hub"
+            capabilities:
+              browserName: "chrome"
+              chrome:
+                switches:
+                  - "--no-sandbox"
+                  - "--headless"
+                  - "--disable-gpu"
+                  - "--disable-dev-shm-usage"
+    Drupal\DrupalExtension:
+      blackbox: ~
+      api_driver: drupal
+      drush_driver: drush
+      drupal:
+        drupal_root: /var/www/html/web
+      drush:
+        root: /var/www/html/web
+      selectors:
+        message_selector: '.messages'
+        error_message_selector: '.messages.error'
+        success_message_selector: '.messages.status'
+        warning_message_selector: '.messages.warning'
+    DrevOps\BehatScreenshotExtension:
+      dir: '%paths.base%/../.logs/screenshots'
+      purge: false
+    DrevOps\BehatFormatProgressFail\FormatExtension: ~
+
+p0:
+  gherkin:
+    cache: '/tmp/behat_gherkin_cache'
+    filters:
+      tags: "@smoke,~@p1&&~@skipped"
+
+p1:
+  gherkin:
+    cache: '/tmp/behat_gherkin_cache'
+    filters:
+      tags: "@smoke,@p1&&~@skipped" 

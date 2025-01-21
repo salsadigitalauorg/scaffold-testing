@@ -18,6 +18,17 @@ jobs:
         ports:
           - 3306:3306
         options: --health-cmd="mysqladmin ping" --health-interval=10s --health-timeout=5s --health-retries=3
+      
+      chrome:
+        image: selenium/standalone-chrome:111.0
+        ports:
+          - 4444:4444
+        options: >-
+          --shm-size="1gb"
+          --health-cmd="/opt/bin/check-grid.sh"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=3
 
     steps:
       - uses: actions/checkout@v2
@@ -70,6 +81,34 @@ jobs:
         run: |
           composer install --prefer-dist --no-interaction --no-progress
 
+      - name: Set up Drupal
+        working-directory: /var/www/html
+        run: |
+          # Create sites/default directory
+          mkdir -p web/sites/default/files
+          chmod -R 777 web/sites/default/files
+
+          # Copy default settings file
+          cp web/sites/default/default.settings.php web/sites/default/settings.php
+          chmod 666 web/sites/default/settings.php
+
+          # Add database configuration
+          cat >> web/sites/default/settings.php << 'EOL'
+
+          $databases['default']['default'] = [
+            'database' => 'drupal',
+            'username' => 'root',
+            'password' => 'root',
+            'host' => '127.0.0.1',
+            'port' => '3306',
+            'driver' => 'mysql',
+            'prefix' => '',
+          ];
+          EOL
+
+          # Install Drupal
+          ./vendor/bin/drush site:install --db-url=mysql://root:root@127.0.0.1/drupal -y
+
       - name: Verify Drupal files
         working-directory: /var/www/html
         run: |
@@ -80,7 +119,7 @@ jobs:
           echo "Drush status:"
           ./vendor/bin/drush status
           echo "Drush requirements:"
-          ./vendor/bin/drush requirements
+          ./vendor/bin/drush core:requirements
 
       - name: Run PHPUnit tests
         working-directory: /var/www/html
@@ -93,7 +132,17 @@ jobs:
             -c phpunit.xml \
             tests/Unit/
 
-      - name: Run Behat tests
+      - name: Create test directories
         working-directory: /var/www/html
         run: |
-          ./vendor/bin/behat --config=behat.yml 
+          mkdir -p .logs/screenshots
+          mkdir -p .logs/test_results/behat
+          chmod -R 777 .logs
+          cp $GITHUB_WORKSPACE/.github/behat.gha.yml behat.yml
+          # Verify FeatureContext class is available
+          ls -la tests/behat/bootstrap/FeatureContext.php
+          cat tests/behat/bootstrap/FeatureContext.php | head -n 5
+
+      - name: Run Behat tests
+        working-directory: /var/www/html
+        run: ./vendor/bin/behat --config=behat.yml 

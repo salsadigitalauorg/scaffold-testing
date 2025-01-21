@@ -10,7 +10,8 @@
   },
   "autoload-dev": {
     "psr-4": {
-      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": "tests/"
+      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": "tests/",
+      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\Behat\\": "tests/behat/bootstrap/"
     }
   },
   "require": {
