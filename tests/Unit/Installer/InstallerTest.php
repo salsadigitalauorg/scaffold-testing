@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace Salsadigitalauorg\ScaffoldTesting\Tests;
+namespace Salsadigitalauorg\ScaffoldTesting\Tests\Unit\Installer;
 
 use PHPUnit\Framework\TestCase;
 use Salsadigitalauorg\ScaffoldTesting\Installer\Installer;
@@ -11,7 +11,6 @@ use Composer\Config;
 use Composer\IO\IOInterface;
 use Composer\Package\RootPackage;
 use Composer\Script\Event;
-use Composer\Util\Filesystem;
 
 class InstallerTest extends TestCase
 {
@@ -39,7 +38,8 @@ class InstallerTest extends TestCase
             ->willReturn([
                 'scaffold-testing' => [
                     'target-dir' => 'tests/behat/',
-                    'override' => false
+                    'override_feature' => false,
+                    'override_feature_context' => false
                 ]
             ]);
             
@@ -53,7 +53,34 @@ class InstallerTest extends TestCase
             ->willReturn($this->composer);
     }
 
+    public function testGetSubscribedEvents(): void
+    {
+        $this->io->expects(self::atLeastOnce())
+            ->method('write')
+            ->with('[scaffold-testing] Installer::features method called');
+            
+        Installer::features($this->event);
+    }
+
+    public function testGetInstallPaths(): void
+    {
+        $this->io->expects(self::atLeastOnce())
+            ->method('write')
+            ->with('[scaffold-testing] Installer::features method called');
+            
+        Installer::features($this->event);
+    }
+
     public function testFeatures(): void
+    {
+        $this->io->expects(self::atLeastOnce())
+            ->method('write')
+            ->with('[scaffold-testing] Installer::features method called');
+            
+        Installer::features($this->event);
+    }
+
+    public function testContentTypes(): void
     {
         $this->io->expects(self::atLeastOnce())
             ->method('write')

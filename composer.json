@@ -1,6 +1,7 @@
 {
   "name": "salsadigitalauorg/scaffold-testing",
   "description": "Testing framework for Vortex scaffold",
+  "version": "0.4.3",
   "type": "library",
   "license": "GPL-2.0-or-later",
   "autoload": {
@@ -8,12 +9,12 @@
       "Salsadigitalauorg\\ScaffoldTesting\\": "src/"
     }
   },
-  "autoload-dev": {
+"autoload-dev": {
     "psr-4": {
-      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": "tests/",
-      "Salsadigitalauorg\\ScaffoldTesting\\Tests\\Behat\\": "tests/behat/bootstrap/"
+        "Salsadigitalauorg\\ScaffoldTesting\\Tests\\": ["tests/", ".github/drupal/tests/"],
+        "Salsadigitalauorg\\ScaffoldTesting\\Tests\\Behat\\": "tests/behat/bootstrap/"
     }
-  },
+},
   "require": {
     "php": ">=8.3",
     "composer/installers": "^2.0",

@@ -23,13 +23,13 @@
         "salsadigitalauorg/scaffold-testing": "@dev"
     },
     "require-dev": {
-        "drupal/core-dev": "^10.1",
-        "phpunit/phpunit": "^9.6",
-        "symfony/phpunit-bridge": "^6.4",
-        "phpspec/prophecy-phpunit": "^2.0",
         "drevops/behat-format-progress-fail": "^1",
         "drevops/behat-screenshot": "1.5.0",
-        "drevops/behat-steps": "^2"
+        "drevops/behat-steps": "^2",
+        "drupal/core-dev": "^10.1",
+        "phpspec/prophecy-phpunit": "^2.0",
+        "phpunit/phpunit": "^9.6",
+        "symfony/phpunit-bridge": "^6.4"
     },
     "conflict": {
         "drupal/drupal": "*"
@@ -39,11 +39,12 @@
     "config": {
         "allow-plugins": {
             "composer/installers": true,
+            "dealerdirect/phpcodesniffer-composer-installer": true,
             "drupal/core-composer-scaffold": true,
             "drupal/core-project-message": true,
+            "php-http/discovery": true,
             "phpstan/extension-installer": true,
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "php-http/discovery": true
+            "tbachert/spi": true
         },
         "sort-packages": true
     },
@@ -89,4 +90,4 @@
             ]
         }
     }
-} 
+}
