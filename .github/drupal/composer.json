@@ -12,13 +12,6 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
-        },
-        {
-            "type": "path",
-            "url": "./scaffold-testing",
-            "options": {
-                "symlink": false
-            }
         }
     ],
     "require": {
