@@ -1,3 +1,91 @@
+# Scaffold Testing
+
+A testing framework for Vortex scaffold that provides automated test setup and configuration.
+
+## Installation
+
+```bash
+composer require salsadigitalauorg/scaffold-testing --dev
+```
+
+## Configuration
+
+Add the following configuration to your project's `composer.json`:
+
+```json
+{
+    "extra": {
+        "scaffold-testing": {
+            "target-dir": "tests/behat/",
+            "files": {
+                "homepage.feature": false,
+                "login.feature": false,
+                "search.feature": false,
+                "contenttypes.feature": false
+            },
+            "override_feature": false,
+            "override_feature_context": false
+        }
+    }
+}
+```
+
+### Configuration Options
+
+- `target-dir`: The directory where test files will be installed (default: `tests/behat/`)
+- `files`: Specific feature files to install and their override settings
+  - Key: Feature file name
+  - Value: Boolean indicating whether to override if file exists
+- `override_feature`: Global override setting for all feature files (default: `false`)
+- `override_feature_context`: Whether to override the FeatureContext.php file (default: `false`)
+
+### Examples
+
+1. Default Setup:
+```json
+{
+    "scaffold-testing": {
+        "target-dir": "tests/behat/"
+    }
+}
+```
+
+2. Custom Directory:
+```json
+{
+    "scaffold-testing": {
+        "target-dir": "custom/path/behat/"
+    }
+}
+```
+
+3. Specific Features with Override:
+```json
+{
+    "scaffold-testing": {
+        "target-dir": "tests/behat/",
+        "files": {
+            "homepage.feature": true,
+            "login.feature": false
+        }
+    }
+}
+```
+
+4. Override All Features:
+```json
+{
+    "scaffold-testing": {
+        "target-dir": "tests/behat/",
+        "override_feature": true
+    }
+}
+```
+
+## Development
+
+See [README.developers.md](README.developers.md) for development setup and guidelines.
+
 #### Overview
 
 The **Scaffold Testing Library** provides a set of default Behat tests tailored for Drupal projects, aiming to ensure consistent testing across different deployments. This library helps streamline the testing process by providing ready-to-use Behat test scenarios that cover common functionalities within Drupal sites.
@@ -9,14 +97,6 @@ The **Scaffold Testing Library** provides a set of default Behat tests tailored 
 - **Workflow Test**: Tests the expected moderation states and transitions between them.
 - **Search Functionality Test**: Verifies that search indexing works and returns expected results.
 - **Content Types Test**: Verifies that content types can be created.
-
-#### Installation
-
-1. **Install the Library**: Run the following command to install the library:
-
-    ```bash
-    composer require --dev salsadigitalauorg/scaffold-testing
-    ```
 
 #### Usage
 

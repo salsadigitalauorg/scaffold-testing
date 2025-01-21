@@ -12,6 +12,16 @@
         {
             "type": "composer",
             "url": "https://packages.drupal.org/8"
+        },
+        {
+            "type": "path",
+            "url": "/var/www/html",
+            "options": {
+                "symlink": true,
+                "versions": {
+                    "salsadigitalauorg/scaffold-testing": "0.4.3"
+                }
+            }
         }
     ],
     "require": {
