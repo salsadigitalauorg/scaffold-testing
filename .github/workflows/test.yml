@@ -29,6 +29,9 @@ jobs:
 
       - name: Run tests
         run: |
+          # Copy phpunit.xml to the working directory
+          cp $GITHUB_WORKSPACE/phpunit.xml phpunit.xml
+
           # Install dependencies
           composer install --no-interaction --no-progress
 
