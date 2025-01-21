@@ -20,7 +20,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      
+        with:
+          path: scaffold-testing
+
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
@@ -29,38 +31,115 @@ jobs:
           coverage: none
           tools: composer:v2
 
+      - name: Install system dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y default-mysql-client
+
+      - name: Create project structure
+        run: |
+          sudo mkdir -p /var/www/html/web
+          sudo chown -R $USER:$USER /var/www/html
+          cp -r scaffold-testing /var/www/html/
+          cd /var/www/html
+          cp scaffold-testing/.github/drupal/composer.json .
+          composer config repositories.scaffold-testing path scaffold-testing
+          ls -la
+
       - name: Get Composer Cache Directory
         id: composer-cache
+        working-directory: /var/www/html
         run: |
           echo "dir=$(composer config cache-files-dir)" >> $GITHUB_OUTPUT
 
       - uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
-          key: ${{ runner.os }}-composer-${{ hashFiles('**/composer.lock') }}
+          key: ${{ runner.os }}-composer-${{ hashFiles('/var/www/html/composer.lock') }}
           restore-keys: |
             ${{ runner.os }}-composer-
 
-      - name: Create Drupal project
+      - name: Install dependencies
+        working-directory: /var/www/html
+        env:
+          COMPOSER_DISABLE_XDEBUG_WARN: 1
+          COMPOSER_PROCESS_TIMEOUT: 2000
+          COMPOSER_DISABLE_UNZIP: 1
         run: |
-          composer create-project drupal/recommended-project:^10 drupal
-          cd drupal
-          composer config repositories.scaffold-testing path "../"
-          composer require salsadigitalauorg/scaffold-testing:@dev --no-interaction
+          composer config --no-plugins allow-plugins.phpstan/extension-installer true
+          composer config allow-plugins.composer/installers true
+          composer config allow-plugins.drupal/core-composer-scaffold true
+          composer config allow-plugins.drupal/core-project-message true
+          composer config allow-plugins.php-http/discovery true
+          composer config allow-plugins.dealerdirect/phpcodesniffer-composer-installer true
+          composer install -v --no-interaction --prefer-dist
+          composer show | grep drupal/core
+          ls -la vendor/salsadigitalauorg/scaffold-testing
+
+      - name: Verify Drupal files
+        working-directory: /var/www/html
+        run: |
+          if [ ! -d "web/core" ]; then
+            echo "Drupal core not found!"
+            exit 1
+          fi
+          echo "Drupal core version:"
+          cat web/core/lib/Drupal.php | grep "const VERSION"
+          ls -la web/core
+          ls -la web/modules
+          ls -la vendor/salsadigitalauorg/scaffold-testing
 
       - name: Install Drupal
+        working-directory: /var/www/html
         run: |
-          cd drupal
+          # Show initial status
+          php -d memory_limit=-1 ./vendor/bin/drush status
+          
+          # Install Drupal
           php -d memory_limit=-1 ./vendor/bin/drush site:install --db-url=mysql://root:root@127.0.0.1/drupal -y
+          
+          # Verify installation
+          php -d memory_limit=-1 ./vendor/bin/drush status
+          if ! php -d memory_limit=-1 ./vendor/bin/drush status --field=bootstrap | grep -q "Successful"; then
+            echo "Drupal not bootstrapped"
+            exit 1
+          fi
+          
+          # Enable required modules
           php -d memory_limit=-1 ./vendor/bin/drush en -y system
+          
+          # Show final status and requirements
+          php -d memory_limit=-1 ./vendor/bin/drush status
+          php -d memory_limit=-1 ./vendor/bin/drush core:requirements | grep -E "Database system|PHP|Drupal"
 
       - name: Run PHPUnit tests
+        if: success()
+        working-directory: /var/www/html
         run: |
-          cd drupal
-          ./vendor/bin/phpunit -c vendor/salsadigitalauorg/scaffold-testing/phpunit.xml
+          # Show test configuration and paths
+          echo "Current directory: $(pwd)"
+          echo "Autoloader path: $(realpath vendor/autoload.php)"
+          echo "PHPUnit config path: $(realpath vendor/salsadigitalauorg/scaffold-testing/phpunit.xml)"
+          
+          # Ensure PHPUnit is properly installed
+          composer show phpunit/phpunit
+          
+          # Dump autoloader with optimization
+          composer dump-autoload -o
+          
+          # Run tests with correct autoloader and configuration
+          XDEBUG_MODE=off \
+          SYMFONY_DEPRECATIONS_HELPER=disabled \
+          ./vendor/bin/phpunit \
+            -v \
+            --bootstrap vendor/autoload.php \
+            -c vendor/salsadigitalauorg/scaffold-testing/phpunit.xml \
+            --colors=always \
+            vendor/salsadigitalauorg/scaffold-testing/tests/Unit/
 
       - name: Run Behat tests
+        if: success()
+        working-directory: /var/www/html
         run: |
-          cd drupal
           cp vendor/salsadigitalauorg/scaffold-testing/tests/behat/behat.yml .
-          ./vendor/bin/behat --config=behat.yml 
+          ./vendor/bin/behat --config=behat.yml --format=progress 

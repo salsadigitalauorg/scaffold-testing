@@ -14,15 +14,18 @@ class InstallerTest extends TestCase
 {
     private $testDir;
     private $vendorDir;
+    private $packageDir;
 
     protected function setUp(): void
     {
         parent::setUp();
-        // Use the same directory as our GitHub Actions workflow
-        $this->testDir = '/tmp/drupal-test';
+        // Use the project root directory
+        $this->testDir = getcwd();
         $this->vendorDir = $this->testDir . '/vendor/salsadigitalauorg/scaffold-testing';
-        if (is_dir($this->testDir)) {
-            $this->removeDirectory($this->testDir);
+        $this->packageDir = dirname(dirname(dirname(__DIR__))); // Go up to scaffold-testing root
+
+        if (is_dir($this->testDir . '/tests')) {
+            $this->removeDirectory($this->testDir . '/tests');
         }
         mkdir($this->vendorDir, 0777, true);
         chdir($this->testDir);
@@ -30,8 +33,8 @@ class InstallerTest extends TestCase
 
     protected function tearDown(): void
     {
-        if (is_dir($this->testDir)) {
-            $this->removeDirectory($this->testDir);
+        if (is_dir($this->testDir . '/tests')) {
+            $this->removeDirectory($this->testDir . '/tests');
         }
         parent::tearDown();
     }
@@ -44,7 +47,7 @@ class InstallerTest extends TestCase
         $config->merge(['config' => ['vendor-dir' => $this->testDir . '/vendor']]);
         $composer->setConfig($config);
 
-        $package = new RootPackage('test/test', '1.0.0.0', '1.0.0');
+        $package = new RootPackage('drupal/recommended-project', '1.0.0.0', '1.0.0');
         $package->setExtra([
             'scaffold-testing' => [
                 'target-dir' => 'tests/behat/',
@@ -112,4 +115,4 @@ class InstallerTest extends TestCase
             rmdir($dir);
         }
     }
-}
+} 
