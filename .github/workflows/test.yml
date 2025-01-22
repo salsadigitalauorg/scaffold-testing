@@ -28,9 +28,10 @@ jobs:
           curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
 
       - name: Run tests
+        working-directory: /var/www/html
         run: |
-          # Copy phpunit.xml to the working directory
-          cp $GITHUB_WORKSPACE/phpunit.xml phpunit.xml
+          # Copy project files to working directory
+          cp -r $GITHUB_WORKSPACE/. .
 
           # Install dependencies
           composer install --no-interaction --no-progress
