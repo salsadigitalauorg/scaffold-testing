@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         bootstrap=".github/drupal/tests/bootstrap.php"
+         colors="true">
+    <testsuites>
+        <testsuite name="Installer Tests">
+            <directory>.github/drupal/tests/Unit/Installer</directory>
+        </testsuite>
+    </testsuites>
+    <php>
+        <ini name="error_reporting" value="-1"/>
+        <env name="APP_ENV" value="testing"/>
+    </php>
+</phpunit>

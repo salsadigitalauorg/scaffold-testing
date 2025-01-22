@@ -13,4 +13,5 @@
 /docker-compose.override.default.yml export-ignore
 /docker-compose.yml export-ignore
 /tmp export-ignore
+/phpunit.xml export-ignore
 /README.developers.md export-ignore

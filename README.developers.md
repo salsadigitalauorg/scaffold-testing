@@ -1,31 +1,111 @@
-#### Overview
+# Developer Documentation
 
-The **Scaffold Testing Library** provides a set of default Behat tests tailored for Drupal projects, aiming to ensure consistent testing across different deployments. This library helps streamline the testing process by providing ready-to-use Behat test scenarios that cover common functionalities within Drupal sites.
+## Testing
 
-#### Installation for developers.
+### Unit Tests
 
-1. **Add the Library to Your Project**: You can include this library in your Drupal project by adding it to your `composer.json` file. Ensure you have access to the library path if it's hosted locally or available on a VCS. For local development, you can use:
+The package includes comprehensive unit tests for all configuration options. Tests are run in a Docker container via GitHub Actions.
 
-    ```json
-    {
-      "repositories": [
-        {
-          "type": "path",
-          "url": "/path/to/scaffold-testing",
-          "options": {
-            "symlink": false
-          }
-        }
-      ],
-      "require-dev": {
-        "salsadigitalauorg/scaffold-testing": "*"
-      }
-    }
-    ```
+#### Test Cases
 
-2. **Install the Library**: Run the following command to install the library:
+1. Default Configuration:
+   - Tests default target directory
+   - Default override settings
 
-    ```bash
-    composer require --dev salsadigitalauorg/scaffold-testing
-    ```
-Refer to the [README.md](README.md) for more information.
+2. Custom Target Directory:
+   - Tests custom directory path
+   - Verifies file creation in custom location
+
+3. Specific Feature Files:
+   - Tests selective feature file installation
+   - Individual override settings per file
+
+4. Override Features:
+   - Tests global override setting
+   - Tests per-file override settings
+
+5. Feature Context:
+   - Tests FeatureContext.php installation
+   - Tests override behavior
+
+### Running Tests Locally
+
+```bash
+# Run PHPUnit tests
+composer phpunit-test
+
+# Run tests in Docker (same as GHA)
+act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
+```
+
+### GitHub Actions Local Development
+
+#### Prerequisites
+1. Install `act` tool:
+   ```bash
+   brew install act  # macOS
+   ```
+
+2. Ensure Docker is running on your machine.
+
+#### Running GHA Locally
+
+Basic usage:
+```bash
+act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
+```
+
+Reset environment and re-run tests:
+```bash
+# Stop and remove all act containers, then run tests
+docker stop $(docker ps -a | grep act | awk '{print $1}') && \
+docker rm --volumes $(docker ps -a | grep act | awk '{print $1}') && \
+act push -W .github/workflows/test.yml --container-architecture linux/amd64 -v
+```
+
+Common issues:
+- If tests fail, always clean up containers before re-running
+- Use `-v` flag for verbose output to debug issues
+- Check Docker logs if containers fail to start
+
+### Test Environment
+
+Tests are executed in a Docker container with the following setup:
+- PHP 8.3
+- Composer 2.x
+- PHPUnit 9.6
+
+### Adding New Tests
+
+When adding new test cases:
+1. Create test method in `tests/Unit/Installer/InstallerTest.php`
+2. Mock necessary Composer components
+3. Add cleanup in tearDown() if creating files
+4. Update test documentation
+
+## Configuration Options
+
+### Target Directory
+- Default: `tests/behat/`
+- Can be customized to any valid path
+- Must be writable by the process
+
+### Feature Files
+- Located in `tests/behat/features/`
+- Default files:
+  - homepage.feature
+  - login.feature
+  - search.feature
+  - contenttypes.feature
+
+### Override Settings
+- Global override: `override_feature`
+- Per-file override in `files` array
+- FeatureContext override: `override_feature_context`
+
+## Development Guidelines
+
+1. Follow PSR-12 coding standards
+2. Add unit tests for new features
+3. Update documentation for configuration changes
+4. Test in Docker environment before committing

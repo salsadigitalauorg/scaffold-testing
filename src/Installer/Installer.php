@@ -40,9 +40,14 @@ class Installer extends LibraryInstaller
 
         $config = $extras['scaffold-testing'];
         $targetDir = rtrim($config['target-dir'] ?? 'tests/behat/', '/') . '/';
+        $override_feature = $config['override_feature'] ?? false;
         $override_feature_context = $config['override_feature_context'] ?? false;
 
-        $targetPath = getcwd() . '/' . $targetDir;
+        // Use absolute path from composer's vendor dir
+        $vendorDir = $composer->getConfig()->get('vendor-dir');
+        $projectRoot = dirname($vendorDir);
+        $targetPath = $projectRoot . '/' . $targetDir;
+        
         $featurePath = $targetPath . 'features/';
         $bootstrapPath = $targetPath . 'bootstrap/';
 
@@ -54,10 +59,10 @@ class Installer extends LibraryInstaller
         if (!isset($config['files']) || empty($config['files'])) {
             // If 'files' is not set or empty, get all .feature files from the source directory
             $files = array_map('basename', glob($sourceDir . '*.feature'));
-            $files = array_fill_keys($files, false);  // Set override to false for all files
+            $files = array_fill_keys($files, $override_feature);  // Use the override_feature setting
         } else {
-            // Convert the list of files to an associative array with override set to false
-            $files = array_fill_keys($config['files'], false);
+            // Convert the list of files to an associative array with override from config
+            $files = array_fill_keys($config['files'], $override_feature);
         }
 
         foreach ($files as $file => $override) {
@@ -67,21 +72,21 @@ class Installer extends LibraryInstaller
             if (file_exists($sourcePath)) {
                 if (!file_exists($destPath)) {
                     if (copy($sourcePath, $destPath)) {
-                        $io->write("Installed $file file to " . dirname($destPath));
+                        $io->write("[scaffold-testing] Installed $file file to " . dirname($destPath));
                     } else {
-                        $io->writeError("Failed to install $file file to " . dirname($destPath));
+                        $io->writeError("[scaffold-testing] Failed to install $file file to " . dirname($destPath));
                     }
                 } else if ($override) {
                     if (copy($sourcePath, $destPath)) {
-                        $io->write("Updated $file file in " . dirname($destPath));
+                        $io->write("[scaffold-testing] Updated $file file in " . dirname($destPath));
                     } else {
-                        $io->writeError("Failed to update $file file in " . dirname($destPath));
+                        $io->writeError("[scaffold-testing] Failed to update $file file in " . dirname($destPath));
                     }
                 } else {
                     $io->write("[scaffold-testing] Skipped $file file as it already exists and override is set to false.");
                 }
             } else {
-                $io->writeError("Source file not found: $file");
+                $io->writeError("[scaffold-testing] Source file not found: $file");
             }
         }
 
@@ -120,9 +125,9 @@ class Installer extends LibraryInstaller
     /**
      * Updates or creates the FeatureContext file.
      */
-    private static function updateFeatureContext(string $projectRoot, IOInterface $io): void
+    private static function updateFeatureContext(string $targetPath, IOInterface $io): void
     {
-        $featureContextPath = $projectRoot . '/tests/behat/features/bootstrap/FeatureContext.php';
+        $featureContextPath = rtrim($targetPath, '/') . '/bootstrap/FeatureContext.php';
         $useStatements = [
             'use Behat\Behat\Context\Context;',
             'use Behat\Behat\Hook\Scope\AfterScenarioScope;',

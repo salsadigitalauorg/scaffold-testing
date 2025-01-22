@@ -1,0 +1,62 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:base",
+    ":semanticCommits",
+    ":semanticPrefixFix",
+    ":ignoreUnstable",
+    ":enableVulnerabilityAlerts",
+    ":separateMajorReleases",
+    ":combinePatchMinorReleases",
+    "group:recommended",
+    "workarounds:all"
+  ],
+  "labels": ["dependencies"],
+  "assignees": ["ivangrynenko"],
+  "reviewers": ["ivangrynenko"],
+  "packageRules": [
+    {
+      "matchManagers": ["composer"],
+      "matchDepTypes": ["require"],
+      "groupName": "PHP production dependencies",
+      "labels": ["php-prod-deps"]
+    },
+    {
+      "matchManagers": ["composer"],
+      "matchDepTypes": ["require-dev"],
+      "groupName": "PHP development dependencies",
+      "labels": ["php-dev-deps"]
+    },
+    {
+      "matchPackagePatterns": ["^drupal/"],
+      "groupName": "Drupal dependencies",
+      "labels": ["drupal-deps"]
+    },
+    {
+      "matchPackagePatterns": ["^symfony/"],
+      "groupName": "Symfony dependencies",
+      "labels": ["symfony-deps"]
+    }
+  ],
+  "composerIgnorePlatformReqs": ["ext-*", "lib-*"],
+  "rangeStrategy": "bump",
+  "schedule": ["after 10pm and before 5am every weekday", "every weekend"],
+  "timezone": "Australia/Sydney",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "stabilityDays": 3,
+  "dependencyDashboard": true,
+  "dependencyDashboardTitle": "Renovate Dependency Dashboard",
+  "commitMessagePrefix": "chore(deps):",
+  "commitBody": "Signed-off-by: salsadeploy <deployer@salsa.digital>",
+  "ignorePaths": [
+    "**/node_modules/**",
+    "**/bower_components/**",
+    ".github/drupal/**"
+  ],
+  "automerge": false,
+  "platformAutomerge": false,
+  "rebaseWhen": "behind-base-branch",
+  "recreateClosed": true,
+  "suppressNotifications": ["prIgnoreNotification"]
+} 

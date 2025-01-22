@@ -1,0 +1,74 @@
+name: Test Scaffold Testing Package
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    container:
+      image: php:8.3-cli
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Install system dependencies
+        run: |
+          apt-get update && apt-get install -y \
+            git \
+            unzip \
+            libzip-dev \
+            tree \
+            && docker-php-ext-install zip
+
+      - name: Install Composer
+        run: |
+          curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
+
+      - name: Run tests
+        working-directory: /var/www/html
+        run: |
+          echo "Debug workspace paths:"
+          echo "GITHUB_WORKSPACE: $GITHUB_WORKSPACE"
+          echo "Current directory: $(pwd)"
+          echo "Workspace contents:"
+          ls -la $GITHUB_WORKSPACE
+          
+          # Copy project files to working directory
+          cp -r $GITHUB_WORKSPACE/. .
+          
+          echo "Current directory structure after copy:"
+          pwd
+          ls -la
+          
+          # Create phpunit.xml
+          echo '<?xml version="1.0" encoding="UTF-8"?>
+          <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+                   bootstrap="vendor/autoload.php"
+                   colors="true">
+              <testsuites>
+                  <testsuite name="Unit">
+                      <directory>tests/Unit</directory>
+                  </testsuite>
+              </testsuites>
+          </phpunit>' > phpunit.xml
+          
+          echo "PHPUnit config contents:"
+          cat phpunit.xml
+          
+          # Install dependencies
+          composer install --no-interaction --no-progress
+          
+          echo "Directory structure after composer install:"
+          tree -L 3
+          
+          # Run PHPUnit tests with debug
+          ./vendor/bin/phpunit \
+            -v \
+            --debug \
+            --configuration phpunit.xml \
+            tests/Unit/ 
