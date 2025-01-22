@@ -33,18 +33,21 @@ jobs:
         run: |
           echo "Current directory structure before copy:"
           pwd
-          ls -la $GITHUB_WORKSPACE
+          ls -la $GITHUB_WORKSPACE/.github/drupal
           echo "phpunit.xml location:"
           find $GITHUB_WORKSPACE -name phpunit.xml
           
           # Copy project files to working directory
           cp -r $GITHUB_WORKSPACE/. .
           
+          # Copy phpunit.xml from .github/drupal
+          cp $GITHUB_WORKSPACE/.github/drupal/phpunit.xml .
+          
           echo "Current directory structure after copy:"
           pwd
           ls -la
           echo "Working directory phpunit.xml:"
-          find . -name phpunit.xml
+          cat phpunit.xml
           
           # Install dependencies
           composer install --no-interaction --no-progress
