@@ -21,6 +21,7 @@ jobs:
             git \
             unzip \
             libzip-dev \
+            tree \
             && docker-php-ext-install zip
 
       - name: Install Composer
@@ -30,14 +31,30 @@ jobs:
       - name: Run tests
         working-directory: /var/www/html
         run: |
+          echo "Current directory structure before copy:"
+          pwd
+          ls -la $GITHUB_WORKSPACE
+          echo "phpunit.xml location:"
+          find $GITHUB_WORKSPACE -name phpunit.xml
+          
           # Copy project files to working directory
           cp -r $GITHUB_WORKSPACE/. .
-
+          
+          echo "Current directory structure after copy:"
+          pwd
+          ls -la
+          echo "Working directory phpunit.xml:"
+          find . -name phpunit.xml
+          
           # Install dependencies
           composer install --no-interaction --no-progress
-
-          # Run PHPUnit tests
+          
+          echo "Directory structure after composer install:"
+          tree -L 3
+          
+          # Run PHPUnit tests with debug
           ./vendor/bin/phpunit \
             -v \
+            --debug \
             --configuration phpunit.xml \
             tests/Unit/ 
