@@ -45,19 +45,17 @@ jobs:
           ls -la
           
           # Create phpunit.xml
-          cat > phpunit.xml << 'EOL'
-<?xml version="1.0" encoding="UTF-8"?>
-<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
-         bootstrap="vendor/autoload.php"
-         colors="true">
-    <testsuites>
-        <testsuite name="Unit">
-            <directory>tests/Unit</directory>
-        </testsuite>
-    </testsuites>
-</phpunit>
-EOL
+          echo '<?xml version="1.0" encoding="UTF-8"?>
+          <phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+                   bootstrap="vendor/autoload.php"
+                   colors="true">
+              <testsuites>
+                  <testsuite name="Unit">
+                      <directory>tests/Unit</directory>
+                  </testsuite>
+              </testsuites>
+          </phpunit>' > phpunit.xml
           
           echo "PHPUnit config contents:"
           cat phpunit.xml
