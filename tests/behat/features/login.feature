@@ -12,8 +12,11 @@ Feature: Login
 
   @api
   Scenario: Administrator user logs in
-    Given I visit "user/login"
-    When I fill in "Username" with "test-user"
+    Given users:
+      | name      | pass   | mail          | roles              | status |
+      | test-user | add-me | test@test.com | Site Administrator | 1      |
+    When I visit "user/login"
+    And I fill in "Username" with "test-user"
     And I fill in "Password" with "add-me"
     And I press the "Log in" button
     Then I save screenshot
